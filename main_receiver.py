@@ -8,7 +8,7 @@ import io
 import time
 
 CSV_STORAGE_FILE = 'received_audio_data.csv'
-PORT = 5000
+PORT = 5200
 
 def process_csv_row(row):
     """
