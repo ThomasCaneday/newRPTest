@@ -5,6 +5,7 @@ import threading
 from csv_handler import write_csv_row
 import csv
 import io
+import time
 
 CSV_STORAGE_FILE = 'received_audio_data.csv'
 PORT = 5000
@@ -24,19 +25,32 @@ def process_csv_row(row):
 def handle_client(conn, addr):
     print(f"Connected by {addr}")
     try:
+        start_time = time.time()
         data = b""
         while True:
             packet = conn.recv(1024)
             if not packet:
                 break
             data += packet
-        # Decode and parse CSV data
+        end_time = time.time()
+
+        latency = end_time - start_time
+        bytes_received = len(data)
+        data_rate = bytes_received / latency if latency > 0 else 0
+
+        print(f"Received {bytes_received} bytes in {latency:.4f}s ({data_rate:.2f} B/s)")
+
+        # Decode and process the received CSV row
         csv_data = data.decode('utf-8').strip()
         if csv_data:
-            csv_reader = csv.reader(io.StringIO(csv_data))
-            for row in csv_reader:
-                write_csv_row(CSV_STORAGE_FILE, row)
-                process_csv_row(row)
+            row = next(csv.reader([csv_data]))
+            write_csv_row(CSV_STORAGE_FILE, row)
+            process_csv_row(row)
+
+        # Optional: log network metrics to file
+        with open("receiver_network_log.csv", "a") as log_file:
+            log_file.write(f"{time.time()},{addr[0]},{bytes_received},{latency:.6f},{data_rate:.2f}\n")
+
     except Exception as e:
         print("Error handling client:", e)
     finally:
