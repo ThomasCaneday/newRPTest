@@ -8,8 +8,8 @@ from csv_handler import create_csv_row, write_csv_row
 from transmitter import send_data
 
 # --- Configuration ---
-RECEIVER_IP = '192.168.1.100'  # Replace with the actual IP address of the receiver Pi
-PORT = 5000
+RECEIVER_IP = '192.168.0.218'  # Replace with the actual IP address of the receiver Pi
+PORT = 5200
 CSV_FILE = 'audio_data.csv'
 RECORD_SECONDS = 1
 SAMPLE_RATE = 44100
