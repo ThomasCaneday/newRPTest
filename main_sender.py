@@ -30,7 +30,13 @@ def main():
             write_csv_row(CSV_FILE, row)
             # Prepare a CSV formatted row for transmission
             csv_row_str = f"{timestamp},{dominant_freq},{amplitude}\n"
-            send_data(csv_row_str, RECEIVER_IP, PORT)
+            # Log latency and data rate
+            latency, bytes_sent = send_data(csv_row_str, RECEIVER_IP, PORT)
+            if latency is not None:
+                data_rate = bytes_sent / latency  # bytes per second
+                print(f"Sent {bytes_sent} bytes in {latency:.4f}s ({data_rate:.2f} B/s)")
+            else:
+                print("Transmission failed.")
     except KeyboardInterrupt:
         print("Stopping recording...")
     finally:
